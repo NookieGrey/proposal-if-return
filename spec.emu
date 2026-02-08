@@ -9,15 +9,24 @@ stage: 0
 contributors: NookieGrey
 </pre>
 
-<emu-clause id="sec-demo-clause">
-  <h1>This is an emu-clause</h1>
-  <p>This is an algorithm:</p>
+<emu-clause id="sec-if-return-overview">
+  <h1>if return overview</h1>
+  <p>
+    This document is a Stage 0 draft for a compact early-return statement form.
+  </p>
+  <p>
+    Proposed statement form:
+  </p>
+  <emu-grammar type="definition">
+    IfReturnStatement :
+      if return Expression ;
+  </emu-grammar>
+  <p>
+    Intended behavior is equivalent to evaluating the expression once and returning it when truthy.
+  </p>
   <emu-alg>
-    1. Let _proposal_ be *undefined*.
-    1. If IsAccepted(_proposal_),
-      1. Let _stage_ be *0*.
-    1. Else,
-      1. Let _stage_ be *-1*.
-    1. Return ? ToString(_proposal_).
+    1. Let _v_ be the result of evaluating |Expression|.
+    1. If ToBoolean(_v_) is *true*, return _v_.
+    1. Return *empty*.
   </emu-alg>
 </emu-clause>

@@ -1,82 +1,138 @@
-# proposal-if-return
+# `if return` proposal
 
+| Field | Value |
+| --- | --- |
+| Proposal | `if return <expression>;` |
+| Authors | [@NookieGrey](https://github.com/NookieGrey) |
+| Champion | Seeking champion(s) |
+| Stage | 0 |
+| Process | [TC39 process document](https://tc39.es/process-document/) |
 
-| ECMAScript proposal  |         `if return %exp%`         |
-|----------------------|-----------------------------------|
-| **Author**           | @NookieGrey                       |
-| **Stage**            | [0](https://tc39.es/process-document/) |
+## Status
 
-## Use cases and motivation
+This repository contains an early Stage 0 draft.
+The main immediate goal is to find TC39 champion(s) to refine scope, syntax, and semantics for potential Stage 1 presentation.
 
-if we need to first check if the data present, and if it is, return it
+## Motivation
 
-we need to get this data either twice
+In JavaScript code, a common early-return pattern repeats often:
+
 ```js
-if (calculate()) {
-    return calculate();
+const value = compute();
+if (value) return value;
+```
+
+The proposal introduces a compact statement form for this exact pattern.
+
+## Proposal shape
+
+Proposed syntax:
+
+```js
+if return expression;
+```
+
+Intended behavior:
+1. Evaluate `expression` once.
+2. If the result is truthy, return that result from the current function.
+3. Otherwise continue execution.
+
+Equivalent desugaring model:
+
+```js
+const _temp = expression;
+if (_temp) return _temp;
+```
+
+`_temp` above is explanatory only; no user-visible binding is created.
+
+## Examples
+
+### Basic use
+
+```js
+function getCachedOrNull(key) {
+  if return cache.get(key);
+  return null;
 }
 ```
 
-or store them in a variable
-
-```js
-const result = calculate();
-if (result) {
-    return result;
-}
-```
-but what if we can reduce that code to a single statement?
-
-```js
-if return calculatie();
-```
-
-example of a typical utility
+### Chained fallbacks
 
 ```js
 function getGoodsPrice(id) {
-      const price = getPrice(id);
-      if (price) {
-            return price;
-      }
-
-      const lastPrice = getLastPrice(id);
-      if (lastPrice) {
-            return lastPrice;
-      }
-
-      return 0;
+  if return getPrice(id);
+  if return getLastPrice(id);
+  return 0;
 }
 ```
 
-can be simplified to
+### Single-evaluation guarantee
 
 ```js
-function getGoodsPrice(id) {
-      if return getPrice(id);
-      if return getLastPrice(id);
-      
-      return 0;
+function read() {
+  if return maybeExpensiveRead();
+  return "default";
 }
 ```
 
-## else statement
+`maybeExpensiveRead()` is evaluated once.
 
-we don't need else
+## Non-goals
 
-```js
-if return calculation1() else if return calculation2()
+- This proposal does not add an `else` branch to `if return`.
+- This proposal does not change JavaScript truthiness rules.
+- This proposal is not currently an expression-form construct.
+
+## Open design questions
+
+1. Is `if return` the best keyword order, or should alternative spellings be considered?
+2. Should this form be allowed everywhere `return` is allowed, or in a narrower context?
+3. Are there parsing or readability concerns with ASI and statement boundaries?
+4. Should tooling enforce/forbid this shorthand in specific style profiles?
+
+## Why built-in syntax?
+
+Userland helpers cannot short-circuit with function-local `return`. This pattern can only be made concise with syntax.
+
+## Champion request
+
+Looking for TC39 champion(s) to help with:
+1. Stage 1 viability assessment.
+2. Syntax and grammar risk review.
+3. Agenda strategy for initial TC39 discussion.
+4. Consensus-building on alternatives.
+
+See `/docs/champion-outreach.md` for a concise outreach message.
+
+## Prototype and experiments
+
+Not required for Stage 0, but useful for feedback quality:
+1. A Babel prototype transform (optional).
+2. ESLint/parser experiment support (optional).
+3. Example corpus rewrite to measure readability impact.
+
+### Babel proof-of-concept
+
+This repository includes a minimal Babel prototype in `/transpiler/babel-plugin-if-return.js`.
+
+Run it on the sample:
+
+```bash
+npm install
+npm run transpile:example
 ```
 
-because its eqvivalent to
+Input:
 
-```js
-if return calculation1();
-if return calculation2();
-```
+- `/examples/input-if-return.js`
 
-since any code after `if return` will be in the else block anyway
+Output:
 
-## transpiler implementations
+- `/examples/output-if-return.js`
 
-WIP
+Current PoC limitation: custom syntax is recognized only for standalone single-line statements in the form `if return <expression>;`.
+
+## Specification draft
+
+Early spec text lives in `/spec.emu` and is intentionally minimal at Stage 0.

@@ -1,19 +1,22 @@
 {
   "private": true,
-  "name": "template-for-proposals",
-  "description": "A repository template for ECMAScript proposals.",
+  "name": "proposal-if-return",
+  "description": "Stage 0 TC39 proposal: if return statement shorthand.",
   "scripts": {
     "start": "npm run build-loose -- --watch",
     "build": "npm run build-loose -- --strict",
-    "build-loose": "ecmarkup --verbose spec.emu index.html"
+    "build-loose": "ecmarkup --verbose spec.emu index.html",
+    "transpile:example": "babel examples/input-if-return.js --plugins ./transpiler/babel-plugin-if-return.js --out-file examples/output-if-return.js"
   },
-  "homepage": "https://github.com/tc39/template-for-proposals#readme",
+  "homepage": "https://github.com/NookieGrey/proposal-if-return#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tc39/template-for-proposals.git"
+    "url": "git+https://github.com/NookieGrey/proposal-if-return.git"
   },
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
     "ecmarkup": "^8.1.0"
   }
 }
